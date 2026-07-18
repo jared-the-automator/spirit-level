@@ -93,7 +93,7 @@ Set `native_models` to whichever models already behave the way you want. Every g
 
 Baseline rule 5 says assumptions get verified rather than ridden. The enforcement arm of that idea lives in its own repo.
 
-[bitch-stop-lyin](https://github.com/jared-the-automator/bitch-stop-lyin) stops the agent asserting things it never checked, built around a taxonomy of the six excuses a model uses to skip a check. It works standalone and needs nothing from here.
+[bitch-stop-lyin](https://github.com/jared-the-automator/bitch-stop-lyin) stops the agent asserting things it never checked, built around a taxonomy of the six excuses a model uses to skip a check. It works standalone and needs nothing from here. (The name is an Ice Cube line and it's addressed to the agent. Rename the directory if it won't fly at your job.)
 
 ```bash
 git clone https://github.com/jared-the-automator/bitch-stop-lyin.git
