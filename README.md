@@ -1,80 +1,46 @@
 # spirit-level
 
-**Hold every model to the standard of your best one.**
+Your best model catches its own bugs before you do. Your cheap model ships them and reports success.
 
-A behavioral protocol for [Claude Code](https://claude.com/claude-code): the
-working habits of a top-tier model, written down as explicit rules, injected
-only into sessions where a lesser model is driving, with the failure modes
-that rules alone can't stop blocked at the tool-call layer.
+spirit-level takes the working habits of the good one, writes them down as explicit rules, and injects them only into the sessions where a lesser model is driving. The three failures that no amount of instruction prevents get blocked at the tool-call layer instead.
 
-A spirit level is the instrument that tells you whether something is actually
-true, or only looks it. Same job here.
-
----
+A spirit level tells you whether something is true or only looks it. Same job.
 
 ## The problem
 
-You settle into a rhythm with a good model. It finds bugs in its own work
-before you do. It tells you when you are wrong, then solves the problem
-anyway. It checks assumptions instead of riding them.
+You settle into a rhythm with a model that works. It re-reads its own diff. It tells you when you're wrong and then hits your goal anyway instead of arguing about it. It checks an assumption before building three files on top of it.
 
-Then you switch models — for cost, for availability, for a long-context run —
-and you are working with something that takes the shortest path that
-technically satisfies the request, states guesses with total confidence, and
-declares victory without running anything.
+Then you switch. Cost, availability, a long-context run, whatever the reason. Now you're working with something that takes the shortest path technically satisfying the request, states guesses with total confidence, and declares victory without running anything.
 
-You should not have to relearn how to talk to your tools every few months.
+Relearning how to talk to your tools every few months is not a workflow.
 
-## The approach
+## What it does
 
-Take the behaviors you get for free from the good model. Write them down.
-Inject them into every session where the good model is *not* driving. Then
-guard the handful of failures that no amount of instruction reliably
-prevents.
+Three tiers, running off four hook events.
 
-Three tiers:
+**Guarded.** A PreToolUse hook denies the call before it runs. Destructive git over uncommitted work, AI attribution in commit messages, credential-shaped strings headed for a file that isn't `.env`. These don't depend on the model cooperating and they cost zero tokens. You override any of them with a `GUARD_OK=1` prefix, which gets logged as a bypass.
 
-**Guarded** — a PreToolUse hook denies the call before it runs. Destructive
-git over uncommitted work, AI attribution in commit messages, plaintext
-secrets headed for the wrong file. These do not depend on the model
-cooperating, and they cost zero tokens. A human can override any of them with
-a logged `GUARD_OK=1` prefix.
+**Baseline.** Eight rules, roughly 350 tokens, injected each turn for the models that need them. Surface what got overlooked. Hunt bugs in your own diff. Verify assumptions instead of riding them. Re-read the original request before declaring done.
 
-**Baseline** — eight rules injected each turn, *only* for models that need
-them. Surface what was overlooked. Hunt bugs in your own diff. The user can
-be wrong — say so, then hit the goal anyway. No lazy paths. Verify
-assumptions instead of riding them. Drift-check before finishing.
+**Advisory.** Unpushed commits at end of turn. The same file edited three times, which usually means guessing rather than debugging.
 
-**Advisory** — non-blocking nudges. Unpushed commits at end of turn. The same
-file edited three times, which almost always means guessing rather than
-debugging.
-
-Everything that fires is appended to a JSONL log you can query with `jq`.
+Everything that fires lands in a JSONL log you can query with `jq`.
 
 ## The honest part
 
-**A system prompt cannot make a model smarter.** It cannot add capability
-that is not already in the weights, and nothing here claims otherwise.
+A system prompt cannot make a model smarter. It can't add capability that isn't already in the weights, and anyone selling you a pasted-in system prompt as an intelligence upgrade is selling you nothing.
 
-What it does is *elicitation* — changing which behaviors the model reaches
-for by default. That is a real and useful difference in output quality, and
-it is a different thing from raising the ceiling. Anyone selling you a
-pasted-in system prompt as an intelligence upgrade is overselling it.
+It does elicitation. It changes which behaviors the model reaches for by default, which is a real difference in output quality and a different thing from raising the ceiling.
 
-This is also why the injection is model-gated: sending a model instructions
-to behave like itself is pure token waste. Models you list as `native_models`
-get nothing but your own house rules.
+That's also why the injection is gated. Telling a model to behave like itself costs about 350 tokens a turn and buys you nothing back. Models you list in `native_models` get your house rules and nothing else.
 
-## How the model gating works
+## How the gating works
 
-Claude Code's hook payloads do not include the active model. But the session
-transcript records `"model"` on every assistant message, and hooks receive
-`transcript_path`. Reading the tail of that file gives you the current model
-in about a millisecond, and it tracks mid-session `/model` switches
-correctly — which a value captured at session start would not.
+Claude Code's hook payloads don't include the active model. The session transcript records `"model"` on every assistant message and hooks receive `transcript_path`, so reading a 256KB tail of that file returns the current model in about a millisecond. It follows mid-session `/model` switches, which a value captured at session start doesn't.
 
-An unrecognized model is treated as non-native and gets the full injection.
-Failing toward more discipline is the safe direction.
+An unrecognized model counts as non-native and receives the full injection. Failing toward more discipline is the safe direction.
+
+This rides on an undocumented transcript format. If a future release changes it, detection degrades to "unknown" and every model gets the baseline. Graceful, but it's the piece in here most likely to need maintenance.
 
 ## Install
 
@@ -84,15 +50,11 @@ cd spirit-level
 ./install.sh
 ```
 
-The installer copies the hooks to `~/.claude/spirit-level/hooks/`, writes a
-default `config.json`, and prints the exact `settings.json` block to paste in
-(it does not edit your settings for you — that file is yours).
+The installer copies hooks to `~/.claude/spirit-level/hooks/`, writes a default `config.json`, and prints the `settings.json` block to paste. It doesn't edit your settings, because that file is yours.
 
-Then put your own always-on rules in
-`~/.claude/spirit-level/hooks/house-rules.md`. It ships empty and injects
-nothing until you fill it.
+Your own always-on rules go in `~/.claude/spirit-level/hooks/house-rules.md`. It ships empty and injects nothing until you fill it.
 
-Uninstall is `rm -rf ~/.claude/spirit-level` plus deleting the settings block.
+Uninstall is `rm -rf ~/.claude/spirit-level` and deleting the settings block.
 
 ## Configure
 
@@ -116,53 +78,33 @@ Uninstall is `rm -rf ~/.claude/spirit-level` plus deleting the settings block.
 }
 ```
 
-Set `native_models` to whichever models already behave the way you want.
-Every guard and advisory can be switched off individually. See
-[docs/CONFIGURING.md](docs/CONFIGURING.md).
+Set `native_models` to whichever models already behave the way you want. Every guard and advisory switches off individually. Details in [docs/CONFIGURING.md](docs/CONFIGURING.md).
 
 ## What's in here
 
 | Path | What it is |
 |---|---|
 | `hooks/` | Five hook scripts. Python 3, standard library only. |
-| `protocol/PROTOCOL.md` | The complete rule set and the reasoning behind each rule. |
+| `protocol/PROTOCOL.md` | Every rule, and the failure each one inverts. |
 | `docs/` | How it works, configuring, writing your own guards. |
-| `tests/` | Fixture-based test suite. `./tests/run.sh` |
+| `tests/` | 47 fixture assertions. `./tests/run.sh` |
 
 ## Companion: bitch-stop-lyin
 
-The baseline's rule 5 says assumptions get verified rather than ridden. The
-enforcement arm of that idea lives in its own repo:
+Baseline rule 5 says assumptions get verified rather than ridden. The enforcement arm of that idea lives in its own repo.
 
-**[bitch-stop-lyin](https://github.com/jared-the-automator/bitch-stop-lyin)**
-— a verification gate that stops the agent asserting things it never checked,
-built around a taxonomy of the six excuses a model uses to skip a check.
-
-It works standalone and needs nothing from this repo. Install it alongside:
+[bitch-stop-lyin](https://github.com/jared-the-automator/bitch-stop-lyin) stops the agent asserting things it never checked, built around a taxonomy of the six excuses a model uses to skip a check. It works standalone and needs nothing from here.
 
 ```bash
 git clone https://github.com/jared-the-automator/bitch-stop-lyin.git
 cp -r bitch-stop-lyin ~/.claude/skills/
 ```
 
-## Prior art and credit
+## Prior art
 
-The idea of distilling a strong model's system prompt into rules for other
-models is not mine. It became a popular topic after a widely-circulated
-system prompt leak, and a number of people published "lite" distillations.
-This is my version of that idea, with three differences I have not seen
-elsewhere:
+Distilling a strong model's system prompt into rules for weaker ones isn't my idea. It got popular after a system prompt leak, and plenty of people published "lite" versions. This is my take, with three differences I haven't seen elsewhere.
 
-1. It is **model-gated**, so the strong model does not pay for instructions
-   describing its own behavior.
-2. It is **enforced, not suggested** — the guard tier blocks tool calls
-   rather than asking nicely.
-3. It is **derived from observed behavior**, not from a leaked prompt. Every
-   rule is the inverse of a failure watched in practice.
-
-The bitch-stop-lyin skill predates all of this and was built the slow way:
-one patch per real incident, then compressed once the patching became the
-problem.
+It's model-gated, so your best model doesn't pay tokens to be told how to be itself. It's enforced, so the guard tier blocks tool calls instead of asking nicely. And it's derived from watching a model work rather than from a leaked prompt, so every rule is the inverse of a failure I watched happen.
 
 ## Requirements
 
