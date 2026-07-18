@@ -38,17 +38,6 @@ fi
 
 echo "    - hooks installed"
 
-# Optional: the bitch-stop-lyin skill
-SKILLS="$HOME/.claude/skills"
-if [ -d "$SKILLS" ]; then
-    read -r -p "==> Install the bitch-stop-lyin skill to $SKILLS? [y/N] " ans
-    if [[ "${ans:-n}" =~ ^[Yy]$ ]]; then
-        mkdir -p "$SKILLS/bitch-stop-lyin"
-        cp "$REPO_DIR/skills/bitch-stop-lyin/SKILL.md" "$SKILLS/bitch-stop-lyin/"
-        echo "    - bitch-stop-lyin skill installed"
-    fi
-fi
-
 cat <<EOF
 
 ==> Done. Add this to the "hooks" object in ~/.claude/settings.json:
@@ -85,5 +74,8 @@ Next steps:
   2. Put your own always-on rules in $HOOKS/house-rules.md
   3. Start a new session. Verify with:
      tail -1 $TARGET/log.jsonl
+
+Companion skill (separate repo, works standalone):
+  https://github.com/jared-the-automator/bitch-stop-lyin
 
 EOF

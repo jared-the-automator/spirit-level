@@ -126,9 +126,24 @@ Every guard and advisory can be switched off individually. See
 |---|---|
 | `hooks/` | Five hook scripts. Python 3, standard library only. |
 | `protocol/PROTOCOL.md` | The complete rule set and the reasoning behind each rule. |
-| `skills/bitch-stop-lyin/` | Standalone skill that stops the agent asserting unverified things. Works without the rest of this repo. |
 | `docs/` | How it works, configuring, writing your own guards. |
 | `tests/` | Fixture-based test suite. `./tests/run.sh` |
+
+## Companion: bitch-stop-lyin
+
+The baseline's rule 5 says assumptions get verified rather than ridden. The
+enforcement arm of that idea lives in its own repo:
+
+**[bitch-stop-lyin](https://github.com/jared-the-automator/bitch-stop-lyin)**
+— a verification gate that stops the agent asserting things it never checked,
+built around a taxonomy of the six excuses a model uses to skip a check.
+
+It works standalone and needs nothing from this repo. Install it alongside:
+
+```bash
+git clone https://github.com/jared-the-automator/bitch-stop-lyin.git
+cp -r bitch-stop-lyin ~/.claude/skills/
+```
 
 ## Prior art and credit
 
