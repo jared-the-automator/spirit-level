@@ -1,9 +1,9 @@
 ---
-name: verification-gate
+name: bitch-stop-lyin
 description: Verification gate that fires on OUTPUT CONTENT, not input keywords. Protocol A covers scope/estimates. Protocol B covers any technical claim about any named external system — in specs, proposals, emails, casual answers, anywhere. Rigid skill — follow exactly.
 ---
 
-# verification-gate
+# bitch-stop-lyin
 
 **RIGID SKILL.** Follow exactly. No shortcuts. No rationalization.
 

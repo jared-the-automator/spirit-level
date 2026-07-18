@@ -38,14 +38,14 @@ fi
 
 echo "    - hooks installed"
 
-# Optional: the verification-gate skill
+# Optional: the bitch-stop-lyin skill
 SKILLS="$HOME/.claude/skills"
 if [ -d "$SKILLS" ]; then
-    read -r -p "==> Install the verification-gate skill to $SKILLS? [y/N] " ans
+    read -r -p "==> Install the bitch-stop-lyin skill to $SKILLS? [y/N] " ans
     if [[ "${ans:-n}" =~ ^[Yy]$ ]]; then
-        mkdir -p "$SKILLS/verification-gate"
-        cp "$REPO_DIR/skills/verification-gate/SKILL.md" "$SKILLS/verification-gate/"
-        echo "    - verification-gate skill installed"
+        mkdir -p "$SKILLS/bitch-stop-lyin"
+        cp "$REPO_DIR/skills/bitch-stop-lyin/SKILL.md" "$SKILLS/bitch-stop-lyin/"
+        echo "    - bitch-stop-lyin skill installed"
     fi
 fi
 

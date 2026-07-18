@@ -126,7 +126,7 @@ Every guard and advisory can be switched off individually. See
 |---|---|
 | `hooks/` | Five hook scripts. Python 3, standard library only. |
 | `protocol/PROTOCOL.md` | The complete rule set and the reasoning behind each rule. |
-| `skills/verification-gate/` | Standalone skill that stops the agent asserting unverified things. Works without the rest of this repo. |
+| `skills/bitch-stop-lyin/` | Standalone skill that stops the agent asserting unverified things. Works without the rest of this repo. |
 | `docs/` | How it works, configuring, writing your own guards. |
 | `tests/` | Fixture-based test suite. `./tests/run.sh` |
 
@@ -145,7 +145,7 @@ elsewhere:
 3. It is **derived from observed behavior**, not from a leaked prompt. Every
    rule is the inverse of a failure watched in practice.
 
-The verification-gate skill predates all of this and was built the slow way:
+The bitch-stop-lyin skill predates all of this and was built the slow way:
 one patch per real incident, then compressed once the patching became the
 problem.
 

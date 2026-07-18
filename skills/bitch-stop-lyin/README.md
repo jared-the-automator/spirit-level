@@ -1,4 +1,4 @@
-# verification-gate
+# bitch-stop-lyin
 
 A skill that stops an agent from stating things it has not checked.
 
@@ -71,7 +71,7 @@ in the commit message.
 Copy the directory into your skills folder:
 
 ```bash
-cp -r skills/verification-gate ~/.claude/skills/
+cp -r skills/bitch-stop-lyin ~/.claude/skills/
 ```
 
 Rename it to whatever you like — the directory name is the invocation name.
