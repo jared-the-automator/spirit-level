@@ -1,0 +1,18 @@
+{
+  "native_models": ["claude-fable"],
+
+  "guards": {
+    "destructive_git_over_wip": true,
+    "ai_attribution_in_commits": true,
+    "plaintext_secrets": true
+  },
+
+  "remote_pins": [],
+
+  "advisories": {
+    "unpushed_commits": true,
+    "repeated_edit_threshold": 3,
+    "turn_interval_reminder": 0,
+    "turn_reminder_text": ""
+  }
+}
