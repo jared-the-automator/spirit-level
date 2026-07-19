@@ -1,6 +1,6 @@
 # How it works
 
-Five hook scripts, one shared library, one append-only log. No daemons, no
+Four hook scripts, one shared library, one append-only log. No daemons, no
 network calls, no third-party packages.
 
 ## The hook events

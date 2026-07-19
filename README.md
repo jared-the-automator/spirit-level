@@ -2,7 +2,7 @@
 
 Your best model catches its own bugs before you do. Your cheap model ships them and reports success.
 
-spirit-level takes the working habits of the good one, writes them down as explicit rules, and injects them only into the sessions where a lesser model is driving. The three failures that no amount of instruction prevents get blocked at the tool-call layer instead.
+spirit-level takes the working habits of the good one, writes them down as explicit rules, and injects them only into the sessions where a lesser model is driving. The failures that no amount of instruction prevents get blocked at the tool-call layer instead.
 
 A spirit level tells you whether something is true or only looks it. Same job.
 
@@ -16,11 +16,13 @@ Relearning how to talk to your tools every few months is not a workflow.
 
 ## What it does
 
-Three tiers, running off four hook events.
+Four tiers, running off four hook events.
 
-**Guarded.** A PreToolUse hook denies the call before it runs. Destructive git over uncommitted work, AI attribution in commit messages, credential-shaped strings headed for a file that isn't `.env`. These don't depend on the model cooperating and they cost zero tokens. You override any of them with a `GUARD_OK=1` prefix, which gets logged as a bypass.
+**Guarded.** A PreToolUse hook denies the call before it runs. Destructive git over uncommitted work, AI attribution in commit messages, credential-shaped strings headed for a file that isn't `.env` (whether written by the Write tool or shoved there by a heredoc, a redirect, or `tee`). These don't depend on the model cooperating and they cost zero tokens. You override any of them with a `GUARD_OK=1` prefix, which gets logged as a bypass.
 
-**Baseline.** Eight rules, roughly 350 tokens, injected each turn for the models that need them. Surface what got overlooked. Hunt bugs in your own diff. Verify assumptions instead of riding them. Re-read the original request before declaring done.
+**Confirm first.** One block injected for every model, the good one included: money, outward sends, deletion, anything irreversible, sudo. Capability is not authorization, so this one isn't gated on which model is driving.
+
+**Baseline.** Eleven rules, roughly 800 tokens, injected each turn for the models that need them. Surface what got overlooked. Hunt bugs in your own diff. Verify assumptions instead of riding them. Plan before multi-step work. Come back done or blocked, because an unknown is work you haven't done rather than a finding you get to report.
 
 **Advisory.** Unpushed commits at end of turn. The same file edited three times, which usually means guessing rather than debugging.
 
@@ -32,7 +34,7 @@ A system prompt cannot make a model smarter. It can't add capability that isn't 
 
 It does elicitation. It changes which behaviors the model reaches for by default, which is a real difference in output quality and a different thing from raising the ceiling.
 
-That's also why the injection is gated. Telling a model to behave like itself costs about 350 tokens a turn and buys you nothing back. Models you list in `native_models` get your house rules and nothing else.
+That's also why the injection is gated. Telling a model to behave like itself costs about 800 tokens a turn and buys you nothing back. Models you list in `native_models` still get the confirm-first block and your house rules, and skip the rest.
 
 ## How the gating works
 
@@ -63,6 +65,7 @@ Uninstall is `rm -rf ~/.claude/spirit-level` and deleting the settings block.
 ```json
 {
   "native_models": ["claude-fable"],
+  "confirm_first": true,
   "guards": {
     "destructive_git_over_wip": true,
     "ai_attribution_in_commits": true,
@@ -84,10 +87,10 @@ Set `native_models` to whichever models already behave the way you want. Every g
 
 | Path | What it is |
 |---|---|
-| `hooks/` | Five hook scripts. Python 3, standard library only. |
-| `protocol/PROTOCOL.md` | Every rule, and the failure each one inverts. |
+| `hooks/` | Four hooks plus a shared library. Python 3, standard library only. |
+| `protocol/PROTOCOL.md` | Every rule, the failure each one inverts, and how to maintain it. |
 | `docs/` | How it works, configuring, writing your own guards. |
-| `tests/` | 47 fixture assertions. `./tests/run.sh` |
+| `tests/` | 101 fixture assertions. `./tests/run.sh` |
 
 ## Companion: bitch-stop-lyin
 

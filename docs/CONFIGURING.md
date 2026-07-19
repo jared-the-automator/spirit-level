@@ -11,15 +11,30 @@ back to defaults, so a partial config is valid. Set
 ```
 
 A list of model-ID **prefixes**. A model whose ID starts with any of these is
-considered to already exhibit the baseline, and gets only your house rules —
-not the eight injected rules.
+considered to already exhibit the baseline, and gets only the confirm-first
+block plus your house rules, not the eleven injected rules.
 
 Set this to whichever model you are happiest with. If you are unsure, set it
-to `[]`: every model then gets the baseline, which costs roughly 350 tokens
+to `[]`: every model then gets the baseline, which costs roughly 800 tokens
 per turn and is never harmful, only occasionally redundant.
 
 Find current model IDs in `~/.claude/settings.json` or by checking a recent
 session transcript.
+
+## `confirm_first`
+
+```json
+"confirm_first": true
+```
+
+Injects the stop-and-confirm block (money, outward sends, deletion,
+irreversible actions, sudo) for **every** model, including ones listed in
+`native_models`. On by default.
+
+Being the best model in the room is not authorization to spend money or send
+mail on someone's behalf, so this block is deliberately not gated the way the
+baseline is. Set it to `false` if your agent has no outward reach at all and
+the reminder is noise.
 
 ## `guards`
 
@@ -32,8 +47,9 @@ session transcript.
 ```
 
 Each is independently switchable. Turn off `ai_attribution_in_commits` if you
-*want* attribution trailers in your history. The other two are worth keeping
-on: they block irreversible outcomes, and the `GUARD_OK=1` prefix is always
+*want* attribution trailers in your history. `plaintext_secrets` covers both the
+Write/Edit path and shell writes (redirects, heredocs, `tee`). The other two
+are worth keeping on: they block irreversible outcomes, and the `GUARD_OK=1` prefix is always
 available when you genuinely mean it.
 
 ## `remote_pins`
@@ -84,7 +100,7 @@ cross-contaminate. If that has never happened to you, leave this empty.
 ## House rules
 
 `~/.claude/spirit-level/hooks/house-rules.md` is injected into **every**
-session regardless of model. Use it for rules about your setup rather than
+session regardless of model, like the confirm-first block. Use it for rules about your setup rather than
 about model behavior — which docs tool to check first, where project context
 lives, which skills are mandatory for which task types.
 
@@ -92,13 +108,13 @@ Keep it short. It is paid for on every turn. An empty file injects nothing.
 
 ## Editing the baseline
 
-The eight rules are a string constant in `protocol-inject.py`. Edit it
+The eleven rules are a string constant in `protocol-inject.py`. Edit it
 directly. Two things to keep in mind:
 
 1. `install.sh` overwrites the hooks. Keep your edits in a fork, or re-apply
    after upgrading.
 2. Length is the real constraint. This text is paid for on every turn of
-   every non-native session. Adding a ninth rule is cheap; adding a ninth
+   every non-native session. Adding a twelfth rule is cheap; adding a twelfth
    paragraph is not. If a rule needs explaining, put the explanation in a
    skill the model can load on demand and keep the injected line to one
    sentence.

@@ -22,6 +22,10 @@ DEFAULT_CONFIG = {
     # Models whose ID starts with any of these are treated as already
     # exhibiting the baseline; they get the slim block, not the full inject.
     "native_models": ["claude-fable"],
+    # The stop-and-confirm block (money, outward sends, deletion, irreversible
+    # actions, sudo) is injected for EVERY model, native ones included.
+    # Capability is not authorization. Set false to drop it.
+    "confirm_first": True,
     "guards": {
         "destructive_git_over_wip": True,
         "ai_attribution_in_commits": True,
@@ -49,6 +53,8 @@ def load_config():
     try:
         with open(CONFIG_PATH) as f:
             user = json.load(f)
+        if not isinstance(user, dict):
+            raise ValueError("config root must be an object")
         for k, v in user.items():
             if isinstance(v, dict) and isinstance(cfg.get(k), dict):
                 cfg[k].update(v)
@@ -56,10 +62,39 @@ def load_config():
                 cfg[k] = v
     except FileNotFoundError:
         pass
-    except (json.JSONDecodeError, OSError) as e:
+    except (json.JSONDecodeError, OSError, ValueError) as e:
         # A broken config must never silently disable the guards.
         print(f"spirit-level: config unreadable ({e}); using defaults",
               file=sys.stderr)
+        cfg = json.loads(json.dumps(DEFAULT_CONFIG))
+    return _coerce(cfg)
+
+
+def _coerce(cfg):
+    """Wrong-typed values must fail toward MORE enforcement, never less.
+
+    A string where a list belongs would otherwise iterate character by
+    character and mark every model native; a non-string entry would raise and
+    take the whole hook down, silently dropping the confirm-first block.
+    """
+    nm = cfg.get("native_models")
+    if isinstance(nm, str):
+        nm = [nm]
+    if not isinstance(nm, list):
+        nm = []
+    cfg["native_models"] = [p for p in nm if isinstance(p, str) and p]
+
+    # `confirm_first: null` must not read as false; only an explicit false
+    # turns the block off.
+    cfg["confirm_first"] = cfg.get("confirm_first") is not False
+
+    if not isinstance(cfg.get("guards"), dict):
+        cfg["guards"] = json.loads(json.dumps(DEFAULT_CONFIG["guards"]))
+    if not isinstance(cfg.get("advisories"), dict):
+        cfg["advisories"] = json.loads(json.dumps(DEFAULT_CONFIG["advisories"]))
+    if not isinstance(cfg.get("remote_pins"), list):
+        cfg["remote_pins"] = []
+    cfg["remote_pins"] = [p for p in cfg["remote_pins"] if isinstance(p, dict)]
     return cfg
 
 

@@ -1,6 +1,8 @@
 {
   "native_models": ["claude-fable"],
 
+  "confirm_first": true,
+
   "guards": {
     "destructive_git_over_wip": true,
     "ai_attribution_in_commits": true,
