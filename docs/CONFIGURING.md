@@ -106,6 +106,36 @@ lives, which skills are mandatory for which task types.
 
 Keep it short. It is paid for on every turn. An empty file injects nothing.
 
+## Applying baseline rules to your native model
+
+The baseline is gated, so a model listed in `native_models` never sees rules
+1-11. That is the point for most of them: telling your best model to hunt bugs
+in its own diff is describing what it already does.
+
+Some of the rules are different. "Come back done or blocked", "plan before
+multi-step work", and "fresh eyes before a high-stakes final" are about how a
+turn ends rather than how well the model codes, and a model can be excellent at
+engineering while still handing back three unverified items. If you want those
+on every model, you have three options.
+
+**Put one-line versions in `house-rules.md`.** House rules inject for everyone,
+so this is the direct answer. Non-native sessions then see a short version in
+your house rules and a fuller one in the baseline, which costs about 80 tokens
+of overlap per turn. That is the cheapest fix and the one to reach for first.
+
+**Set `native_models: []`.** Every model gets the full baseline. Simple, and it
+costs your best model roughly 800 tokens a turn to be told things it mostly
+already knows. Worth it if you would rather not maintain two versions of the
+same rule.
+
+**Fork the split.** Move the rules you want universal out of `BASELINE` and
+into a second always-injected constant in `protocol-inject.py`, next to
+`CONFIRM_FIRST`. Cleanest result, and you own the merge conflict the next time
+you pull.
+
+The confirm-first block already works this way for exactly this reason:
+capability is not authorization, so it is never gated.
+
 ## Editing the baseline
 
 The eleven rules are a string constant in `protocol-inject.py`. Edit it
